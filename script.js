@@ -3,6 +3,7 @@ const defaultGenres = ["Beletrie", "Sci-fi", "Fantasy", "Detektivka", "Thriller"
 let users = []; 
 let allBooks = []; 
 let currentUser = null; 
+let previousView = 'home'; // Pamatuje si, kam má vést tlačítko Zpět
 
 function loadData() {
     const savedUsers = localStorage.getItem('library_users');
@@ -43,7 +44,6 @@ function login() {
     const u = document.getElementById('usernameInput').value.trim();
     const p = document.getElementById('passwordInput').value;
     const errorLabel = document.getElementById('loginError');
-
     const userFound = users.find(user => user.username === u && user.password === p);
     
     if (userFound) {
@@ -115,14 +115,24 @@ function setActiveMenu(element) {
     if(window.innerWidth <= 850) toggleSidebar();
 }
 
-// Zobrazí hlavní stránku (včetně seskupených sérií)
+// Chytřejší navigace Zpět
+function goBack() {
+    if (previousView === 'seriesList') {
+        renderSeriesView();
+    } else {
+        renderHome();
+    }
+}
+
 function renderHome() {
+    previousView = 'home';
     document.getElementById('pageTitle').innerText = 'Všechny knihy';
     renderBooks(getUserBooks(), false, "", true);
 }
 
-// Zobrazí POUZE seznam sérií
+// Zobrazí POUZE ikony/složky sérií (Nová záložka v menu)
 function renderSeriesView() {
+    previousView = 'seriesList';
     document.getElementById('pageTitle').innerText = 'Knižní série';
     const grid = document.getElementById('booksGrid');
     grid.innerHTML = '';
@@ -130,6 +140,7 @@ function renderSeriesView() {
 
     const userBooks = getUserBooks();
     const seriesGroups = {};
+    
     userBooks.forEach(b => {
         if (b.series && b.series.trim() !== "") {
             if (!seriesGroups[b.series]) seriesGroups[b.series] = [];
@@ -140,20 +151,13 @@ function renderSeriesView() {
     for (const sName in seriesGroups) {
         const sBooks = seriesGroups[sName];
         const card = document.createElement('div');
-        card.className = 'book-card series-card';
+        card.className = 'book-card series-card-special';
         card.onclick = () => renderBooks(sBooks, true, sName, false); 
         
         card.innerHTML = `
-            <div class="book-cover" style="background: linear-gradient(135deg, #334155, #0f172a);">
-                <div style="text-align:center;">
-                    <div class="series-icon">📚</div>
-                    <span>${sBooks.length} knih v sérii</span>
-                </div>
-            </div>
-            <div class="book-info">
-                <div class="book-title">${sName}</div>
-                <div class="book-author">Knižní série</div>
-            </div>
+            <div style="font-size: 60px; margin-bottom: 15px;">📚</div>
+            <div style="font-size: 18px; font-weight: 800; color: #3730a3; text-align: center;">${sName}</div>
+            <div style="font-size: 13px; color: #4f46e5; font-weight: 600; margin-top: 10px; background: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 12px;">${sBooks.length} dílů</div>
         `;
         grid.appendChild(card);
     }
@@ -176,6 +180,7 @@ function renderBooks(booksToRender = getUserBooks(), isInsideSeries = false, ser
 
     let standaloneBooks = [];
 
+    // Tvorba složek na domovské stránce
     if (groupSeries && !isInsideSeries) {
         const seriesGroups = {};
         booksToRender.forEach(b => {
@@ -190,26 +195,20 @@ function renderBooks(booksToRender = getUserBooks(), isInsideSeries = false, ser
         for (const sName in seriesGroups) {
             const sBooks = seriesGroups[sName];
             const card = document.createElement('div');
-            card.className = 'book-card series-card';
+            card.className = 'book-card series-card-special';
             card.onclick = () => renderBooks(sBooks, true, sName, false); 
             
             card.innerHTML = `
-                <div class="book-cover" style="background: linear-gradient(135deg, #334155, #0f172a);">
-                    <div style="text-align:center;">
-                        <div class="series-icon">📚</div>
-                        <span>${sBooks.length} knih v sérii</span>
-                    </div>
-                </div>
-                <div class="book-info">
-                    <div class="book-title">${sName}</div>
-                    <div class="book-author">Knižní série</div>
-                </div>
+                <div style="font-size: 60px; margin-bottom: 15px;">📚</div>
+                <div style="font-size: 18px; font-weight: 800; color: #3730a3; text-align: center;">${sName}</div>
+                <div style="font-size: 13px; color: #4f46e5; font-weight: 600; margin-top: 10px; background: rgba(255,255,255,0.7); padding: 5px 12px; border-radius: 12px;">${sBooks.length} dílů</div>
             `;
             grid.appendChild(card);
         }
         booksToRender = standaloneBooks;
     }
 
+    // Vykreslení samotných knih
     booksToRender.forEach(book => {
         const card = document.createElement('div');
         card.className = 'book-card';
@@ -218,7 +217,6 @@ function renderBooks(booksToRender = getUserBooks(), isInsideSeries = false, ser
         let coverClass = (book.format === 'E-book') ? 'book-cover cover-ebook' : 'book-cover';
         let coverHtml = book.cover ? `<img src="${book.cover}" class="${coverClass}" alt="Obálka">` : `<div class="${coverClass}"><span>${book.title}</span></div>`;
         
-        // Obojí = oba odznáčky
         let formatBadges = '';
         if (book.format === 'Obojí') {
             formatBadges = `<span class="badge badge-physical">Fyzická</span> <span class="badge badge-ebook">E-book</span>`;
@@ -292,7 +290,6 @@ function filterByLanguage(lang) {
 }
 function filterByPurpose(purpose) {
     document.getElementById('pageTitle').innerText = purpose;
-    // Zobrazí knihy individuálně (bez slučování do sérií), aby šly dobře rolovat
     renderBooks(getUserBooks().filter(b => b.purpose === purpose), false, "", false);
 }
 
@@ -404,7 +401,7 @@ function saveBook(e) {
 
     saveData();
     closeModal();
-    renderHome(); // Po uložení se automaticky vrátí na domovskou stránku
+    renderHome(); 
     setActiveMenu(document.querySelector('#menuList li:first-child'));
 }
 
@@ -418,7 +415,6 @@ function deleteBook() {
     }
 }
 
-// Start aplikace
 window.onload = loadData;
 
 if ('serviceWorker' in navigator) {
