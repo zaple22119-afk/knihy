@@ -1,12 +1,10 @@
 // --- SYSTÉMOVÁ DATA ---
 const defaultGenres = ["Beletrie", "Sci-fi", "Fantasy", "Detektivka", "Thriller", "Horor", "Romantika", "Historický román", "Odborná literatura", "Osobní rozvoj", "Biografie", "Poezie", "Komiks / Manga", "Klasika"];
 
-// --- STAV APLIKACE ---
 let users = []; 
 let allBooks = []; 
 let currentUser = null; 
 
-// --- INICIALIZACE A NAČTÁNÍ Z LOCALSTORAGE ---
 function loadData() {
     const savedUsers = localStorage.getItem('library_users');
     const savedBooks = localStorage.getItem('library_books');
@@ -30,7 +28,6 @@ function saveData() {
     localStorage.setItem('library_books', JSON.stringify(allBooks));
 }
 
-// --- PŘIHLAŠOVÁNÍ ---
 function showLogin() {
     document.getElementById('loginScreen').style.display = 'flex';
     document.getElementById('appScreen').style.display = 'none';
@@ -73,7 +70,6 @@ function register() {
         errorLabel.style.display = 'block';
         return;
     }
-
     if (users.find(user => user.username === u)) {
         errorLabel.innerText = "Tento uživatel už existuje.";
         errorLabel.style.display = 'block';
@@ -82,7 +78,6 @@ function register() {
 
     users.push({ username: u, password: p });
     saveData();
-    
     currentUser = u;
     localStorage.setItem('library_session', u);
     errorLabel.style.display = 'none';
@@ -97,7 +92,6 @@ function logout() {
     showLogin();
 }
 
-// --- UI FUNKCE (Menu, Filtry) ---
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('sidebarOverlay').classList.toggle('active');
@@ -107,7 +101,6 @@ function toggleFilters() {
     document.getElementById('filtersPanel').classList.toggle('hidden');
 }
 
-// --- ZÍSKÁNÍ KNIH AKTUÁLNÍHO UŽIVATELE ---
 function getUserBooks() {
     return allBooks.filter(b => b.owner === currentUser);
 }
@@ -124,56 +117,123 @@ function setActiveMenu(element) {
     if(window.innerWidth <= 850) toggleSidebar();
 }
 
-// --- VYKRESLOVÁNÍ KNIH ---
-function renderBooks(booksToRender = getUserBooks()) {
+// --- NOVÁ LOGIKA VYKRESLOVÁNÍ (SÉRIE) ---
+function renderBooks(booksToRender = getUserBooks(), isInsideSeries = false, seriesName = "") {
     const grid = document.getElementById('booksGrid');
     grid.innerHTML = '';
+    
+    // Zobrazení/Skrytí tlačítka zpět
+    document.getElementById('backToBooksBtn').style.display = isInsideSeries ? 'block' : 'none';
 
     if(booksToRender === getUserBooks()) {
         booksToRender = booksToRender.filter(b => b.ownership !== 'Wishlist');
     }
 
+    // Pokud jsme v detailu série, změníme nadpis a seřadíme knihy podle čísla
+    if (isInsideSeries) {
+        document.getElementById('pageTitle').innerText = 'Série: ' + seriesName;
+        booksToRender.sort((a, b) => (parseInt(a.seriesOrder) || 999) - (parseInt(b.seriesOrder) || 999));
+    }
+
+    let standaloneBooks = [];
+
+    // Pokud nejsme v sérii, seskupíme knihy do sérií
+    if (!isInsideSeries) {
+        const seriesGroups = {};
+        
+        booksToRender.forEach(b => {
+            if (b.series && b.series.trim() !== "") {
+                if (!seriesGroups[b.series]) seriesGroups[b.series] = [];
+                seriesGroups[b.series].push(b);
+            } else {
+                standaloneBooks.push(b);
+            }
+        });
+
+        // Vykreslení karet sérií
+        for (const sName in seriesGroups) {
+            const sBooks = seriesGroups[sName];
+            const card = document.createElement('div');
+            card.className = 'book-card series-card';
+            card.onclick = () => renderBooks(sBooks, true, sName); // Po kliknutí vykresli knihy ze série
+            
+            card.innerHTML = `
+                <div class="book-cover" style="background: linear-gradient(135deg, #334155, #0f172a);">
+                    <div style="text-align:center;">
+                        <div class="series-icon">📚</div>
+                        <span>${sBooks.length} knih v sérii</span>
+                    </div>
+                </div>
+                <div class="book-info">
+                    <div class="book-title">${sName}</div>
+                    <div class="book-author">Knižní série</div>
+                </div>
+            `;
+            grid.appendChild(card);
+        }
+        
+        // Zbytek knih k vykreslení pod sériemi
+        booksToRender = standaloneBooks;
+    }
+
+    // Vykreslení samotných knih
     booksToRender.forEach(book => {
         const card = document.createElement('div');
         card.className = 'book-card';
         card.onclick = () => editBook(book.id);
         
-        let coverHtml = book.cover ? `<img src="${book.cover}" class="book-cover" alt="Obálka">` : `<div class="book-cover"><span>${book.title}</span></div>`;
+        // Zelená obálka pro e-book
+        let coverClass = book.format === 'E-book' ? 'book-cover cover-ebook' : 'book-cover';
+        let coverHtml = book.cover ? `<img src="${book.cover}" class="${coverClass}" alt="Obálka">` : `<div class="${coverClass}"><span>${book.title}</span></div>`;
+        
         let formatClass = book.format === 'E-book' ? 'badge-ebook' : 'badge-physical';
         let genresHtml = (book.genres || []).map(g => `<span class="badge badge-genre">${g}</span>`).join('');
         
-        // Přidání textové recenze, pokud existuje
+        // Odkaz na rozbor (kliknutím se zabrání otevření úprav knihy)
+        let rozborHtml = book.rozborUrl ? `<a href="${book.rozborUrl}" target="_blank" class="link-rozbor" onclick="event.stopPropagation()">📄 Otevřít rozbor</a>` : '';
         let reviewHtml = book.review ? `<div class="book-review-preview">"${book.review}"</div>` : '';
+
+        // Jméno včetně čísla v sérii
+        let displayTitle = book.title;
+        if (isInsideSeries && book.seriesOrder) {
+            displayTitle = `#${book.seriesOrder} - ` + book.title;
+        }
 
         card.innerHTML = `
             ${coverHtml}
             <div class="book-info">
-                <div class="book-title">${book.title}</div>
+                <div class="book-title">${displayTitle}</div>
                 <div class="book-author">${book.author}</div>
                 <div class="book-badges">
-                    <span class="badge ${formatClass}">${book.format}</span>
+                    <span class="badge ${formatClass}">E-book</span>
                     <span class="badge badge-lang">🌐 ${book.language || 'Neznámo'}</span>
+                    ${book.purpose === 'Povinná četba' ? '<span class="badge" style="background:#fee2e2; color:#b91c1c;">🎓 Povinná četba</span>' : ''}
                     ${book.readStatus === 'Dočteno' ? '<span class="badge badge-read">✓ Přečteno</span>' : ''}
                     ${book.rating ? '<span class="badge badge-read">⭐ ' + book.rating + '</span>' : ''}
                 </div>
                 <div class="book-badges" style="margin-top: 5px;">${genresHtml}</div>
+                ${rozborHtml}
                 ${reviewHtml}
             </div>
         `;
+        // Oprava: Pokud je formát jiný než E-book, přepíšeme badge text zpět na Fyzická (hack pro UI)
+        if(book.format !== 'E-book') {
+            card.querySelector(`.${formatClass}`).innerText = book.format;
+        }
+
         grid.appendChild(card);
     });
 
     updateFiltersAndAuthors();
 }
 
-// --- FILTRY ---
 function searchBooks() {
     const query = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = getUserBooks().filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query));
-    renderBooks(filtered);
+    const filtered = getUserBooks().filter(b => b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query) || (b.series && b.series.toLowerCase().includes(query)));
+    // Při vyhledávání vždy zrušíme shlukování sérií, ať rovnou vidíme výsledky
+    renderBooks(filtered, true, "Výsledky vyhledávání");
 }
 
-// Úprava pro Select filtry (pokud je prázdná hodnota, zobrazí se vše)
 function filterByFormat(format) { 
     if(!format) { renderBooks(); return; }
     renderBooks(getUserBooks().filter(b => b.format === format)); 
@@ -196,8 +256,10 @@ function filterByLanguage(lang) {
     if(!lang) { renderBooks(); return; }
     renderBooks(getUserBooks().filter(b => b.language === lang)); 
 }
+function filterByPurpose(purpose) {
+    renderBooks(getUserBooks().filter(b => b.purpose === purpose));
+}
 
-// Generování možností do <select> filtrů
 function updateFiltersAndAuthors() {
     const userBooks = getUserBooks();
     
@@ -213,7 +275,6 @@ function updateFiltersAndAuthors() {
     document.getElementById('authorDatalist').innerHTML = authors.map(a => `<option value="${a}">`).join('');
 }
 
-// --- NAHRÁVÁNÍ OBRÁZKU DO BASE64 ---
 document.getElementById('bCoverFile').addEventListener('change', function(event) {
     const file = event.target.files[0];
     if (file) {
@@ -226,7 +287,6 @@ document.getElementById('bCoverFile').addEventListener('change', function(event)
     }
 });
 
-// --- MODÁLNÍ OKNO A FORMULÁŘ ---
 function openModal() {
     document.getElementById('bookForm').reset();
     document.getElementById('bookId').value = '';
@@ -251,13 +311,17 @@ function editBook(id) {
     document.getElementById('bCoverBase64').value = book.cover && book.cover.startsWith('data:image') ? book.cover : '';
     document.getElementById('bCoverFile').value = ''; 
     
+    // Nová data (série, povinná četba, rozbor)
+    document.getElementById('bPurpose').value = book.purpose || 'Pro radost';
+    document.getElementById('bRozborUrl').value = book.rozborUrl || '';
+    document.getElementById('bSeries').value = book.series || '';
+    document.getElementById('bSeriesOrder').value = book.seriesOrder || '';
+
     document.getElementById('bLanguage').value = book.language || 'Čeština';
     document.getElementById('bFormat').value = book.format;
     document.getElementById('bOwnership').value = book.ownership;
     document.getElementById('bReadStatus').value = book.readStatus;
     document.getElementById('bRating').value = book.rating || '';
-    
-    // Načtení recenze do textarey
     document.getElementById('bReview').value = book.review || '';
     
     document.querySelectorAll('.genre-checkbox').forEach(cb => { cb.checked = (book.genres || []).includes(cb.value); });
@@ -282,13 +346,17 @@ function saveBook(e) {
         title: document.getElementById('bTitle').value,
         author: document.getElementById('bAuthor').value,
         cover: finalCover,
+        purpose: document.getElementById('bPurpose').value,
+        rozborUrl: document.getElementById('bRozborUrl').value,
+        series: document.getElementById('bSeries').value,
+        seriesOrder: document.getElementById('bSeriesOrder').value,
         language: document.getElementById('bLanguage').value,
         genres: selectedGenres,
         format: document.getElementById('bFormat').value,
         ownership: document.getElementById('bOwnership').value,
         readStatus: document.getElementById('bReadStatus').value,
         rating: document.getElementById('bRating').value,
-        review: document.getElementById('bReview').value // Uložení textové recenze
+        review: document.getElementById('bReview').value 
     };
 
     if (id) {
@@ -318,15 +386,10 @@ function deleteBook() {
 // Start aplikace
 window.onload = loadData;
 
-// --- REGISTRACE SERVICE WORKERU (PWA) ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-                console.log('Service Worker úspěšně zaregistrován s rozsahem:', registration.scope);
-            })
-            .catch(error => {
-                console.log('Registrace Service Workeru selhala:', error);
-            });
+            .then(registration => { console.log('SW úspěšně zaregistrován'); })
+            .catch(error => { console.log('SW chyba:', error); });
     });
 }
