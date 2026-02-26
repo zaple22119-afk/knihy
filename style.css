@@ -1,8 +1,7 @@
-/* --- MODERNÍ PROMĚNNÉ A ZÁKLAD --- */
 :root {
     --primary: #6366f1;
     --primary-hover: #4f46e5;
-    --bg-color: #f8fafc; /* Světlejší šedá */
+    --bg-color: #f8fafc;
     --surface: #ffffff;
     --text-main: #0f172a;
     --text-muted: #64748b;
@@ -12,36 +11,27 @@
     --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Změna na moderní font */
 * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
 
-body { 
-    display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; 
-}
+body { display: flex; height: 100vh; background-color: var(--bg-color); color: var(--text-main); overflow: hidden; }
 
-/* --- PŘIHLAŠOVACÍ OBRAZOVKA --- */
-#loginScreen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 2000;
-}
-.login-box {
-    background: var(--surface); padding: 40px; border-radius: 20px; box-shadow: var(--shadow-md); width: 90%; max-width: 400px; text-align: center;
-}
+/* Login */
+#loginScreen { position: fixed; inset: 0; background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+.login-box { background: var(--surface); padding: 40px; border-radius: 20px; box-shadow: var(--shadow-md); width: 90%; max-width: 400px; text-align: center; }
 .login-box h1 { margin-bottom: 20px; font-size: 26px; font-weight: 800; color: var(--primary); }
-.login-box input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 15px; transition: 0.2s;}
+.login-box input { width: 100%; padding: 14px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 15px; transition: 0.2s; }
 .login-box input:focus { border-color: var(--primary); }
-.login-box button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; margin-bottom: 10px; transition: 0.2s;}
+.login-box button { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 15px; cursor: pointer; margin-bottom: 10px; transition: 0.2s; }
 .login-box button:hover { background: var(--primary-hover); transform: translateY(-2px); }
 .login-box .btn-secondary { background: #f1f5f9; color: var(--text-main); }
 .login-box .btn-secondary:hover { background: #e2e8f0; }
 .error-msg { color: #ef4444; font-size: 14px; font-weight: 600; margin-bottom: 15px; display: none; }
 
-/* --- HLAVNÍ APLIKACE --- */
+/* Aplikace */
 #appScreen { display: none; width: 100%; height: 100%; flex-direction: row; }
 
-/* --- MENU / SIDEBAR --- */
-.sidebar {
-    width: 260px; background-color: var(--surface); border-right: var(--border-light); padding: 30px 20px; display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
+/* Sidebar */
+.sidebar { width: 260px; background-color: var(--surface); border-right: var(--border-light); padding: 30px 20px; display: flex; flex-direction: column; z-index: 100; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 .sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
 .sidebar h2 { font-size: 22px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; }
 .close-menu-btn { display: none; background: none; border: none; font-size: 24px; color: var(--text-muted); cursor: pointer; }
@@ -54,35 +44,33 @@ body {
 .user-info { text-align: center; font-size: 13px; color: var(--text-muted); }
 .logout-btn { background: #fef2f2; color: #ef4444; padding: 12px; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 700; transition: 0.2s; }
 .logout-btn:hover { background: #fee2e2; }
-.add-btn { background-color: var(--primary); color: white !important; padding: 14px; border-radius: 10px; text-align: center; font-weight: 700; box-shadow: var(--shadow-sm); cursor: pointer; transition: 0.2s;}
+.add-btn { background-color: var(--primary); color: white !important; padding: 14px; border-radius: 10px; text-align: center; font-weight: 700; box-shadow: var(--shadow-sm); cursor: pointer; transition: 0.2s; }
 .add-btn:hover { background-color: var(--primary-hover) !important; transform: translateY(-2px); }
 
-/* Zatemnění pozadí pro mobilní menu */
-.sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 90; opacity: 0; transition: opacity 0.3s; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 90; opacity: 0; transition: opacity 0.3s; }
 
-/* --- HLAVNÍ OBSAH --- */
+/* Hlavní obsah */
 .main-content { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
 .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 20px; }
 .header-title-row { display: flex; align-items: center; gap: 15px; }
 .menu-btn { display: none; background: var(--surface); border: var(--border-light); border-radius: 8px; width: 40px; height: 40px; font-size: 20px; cursor: pointer; color: var(--primary); box-shadow: var(--shadow-sm); }
 h1 { font-size: 32px; font-weight: 800; color: var(--text-main); }
 
-/* --- VYHLEDÁVÁNÍ A FILTRY --- */
+/* Filtry a vyhledávání */
 .search-filter-wrapper { display: flex; gap: 10px; align-items: center; }
 .search-bar { width: 300px; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 20px; background-color: var(--surface); outline: none; box-shadow: var(--shadow-sm); font-weight: 500; transition: 0.2s; }
 .search-bar:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
 .toggle-filters-btn { background: var(--surface); border: 2px solid #e2e8f0; padding: 10px 15px; border-radius: 12px; font-weight: 700; cursor: pointer; color: var(--text-main); transition: 0.2s; }
 .toggle-filters-btn:hover { border-color: var(--primary); color: var(--primary); }
 
-.filters-panel { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-md); margin-bottom: 30px; transition: all 0.3s ease; overflow: hidden; }
+.filters-panel { background: var(--surface); border-radius: 16px; padding: 20px; box-shadow: var(--shadow-md); margin-bottom: 30px; transition: all 0.3s ease; }
 .filters-panel.hidden { display: none; }
-.filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; }
-.filters-panel h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; font-weight: 700; }
-.filter-list { list-style: none; max-height: 150px; overflow-y: auto; }
-.filter-list li { font-size: 14px; font-weight: 500; padding: 8px 10px; cursor: pointer; border-radius: 8px; color: var(--text-main); transition: 0.2s; }
-.filter-list li:hover { background-color: #f1f5f9; color: var(--primary); }
+.filters-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+.filter-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+.filter-group select { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; font-weight: 600; outline: none; cursor: pointer; background: var(--surface); }
+.filter-group select:focus { border-color: var(--primary); }
 
-/* --- MŘÍŽKA KNIH --- */
+/* Mřížka knih */
 .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; padding-bottom: 40px; }
 .book-card { background-color: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-md); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; border: 1px solid transparent; }
 .book-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-hover); border-color: rgba(99, 102, 241, 0.3); }
@@ -95,51 +83,45 @@ h1 { font-size: 32px; font-weight: 800; color: var(--text-main); }
 .badge-physical { background-color: #fce7f3; color: #db2777; }
 .badge-ebook { background-color: #dcfce7; color: #16a34a; }
 .badge-genre { background-color: #e0e7ff; color: #4338ca; }
-.badge-lang { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1;}
+.badge-lang { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
 .badge-read { background-color: #fef08a; color: #854d0e; }
 
-/* --- MODÁLNÍ OKNO --- */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+/* Slovní hodnocení (ukázka na kartě) */
+.book-review-preview { font-size: 12px; color: var(--text-muted); font-style: italic; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--border-light); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* Modální okno */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
 .modal { background: var(--surface); padding: 35px; border-radius: 20px; width: 100%; max-width: 500px; box-shadow: var(--shadow-hover); max-height: 90vh; overflow-y: auto; }
-.modal h2 { margin-bottom: 25px; color: var(--primary); font-weight: 800; font-size: 24px;}
+.modal h2 { margin-bottom: 25px; color: var(--primary); font-weight: 800; font-size: 24px; }
 .form-group { margin-bottom: 18px; }
-.form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 13px; color: var(--text-muted); text-transform: uppercase;}
-.form-group input[type="text"], .form-group input[type="url"], .form-group input[type="number"], .form-group select { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 14px; font-weight: 500; transition: 0.2s;}
-.form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+.form-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
+.form-group input[type="text"], .form-group input[type="url"], .form-group input[type="number"], .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 10px; outline: none; font-size: 14px; font-weight: 500; transition: 0.2s; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
 .form-group input[type="file"] { width: 100%; padding: 8px; font-size: 13px; }
 .checkbox-group { max-height: 120px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .checkbox-group label { font-size: 14px; font-weight: 500; display: flex; align-items: center; cursor: pointer; }
 .checkbox-group input { margin-right: 8px; cursor: pointer; width: 16px; height: 16px; accent-color: var(--primary); }
 .form-row { display: flex; gap: 15px; }
 .btn-group { display: flex; gap: 12px; margin-top: 30px; }
-.btn-submit { background: var(--primary); color: #fff; padding: 14px; border: none; border-radius: 10px; cursor: pointer; flex: 1; font-weight: 700; transition: 0.2s;}
-.btn-submit:hover { background: var(--primary-hover); transform: translateY(-2px);}
-.btn-close { background: #f1f5f9; color: var(--text-main); padding: 14px; border: none; border-radius: 10px; cursor: pointer; flex: 1; font-weight: 700; transition: 0.2s;}
+.btn-submit { background: var(--primary); color: #fff; padding: 14px; border: none; border-radius: 10px; cursor: pointer; flex: 1; font-weight: 700; transition: 0.2s; }
+.btn-submit:hover { background: var(--primary-hover); transform: translateY(-2px); }
+.btn-close { background: #f1f5f9; color: var(--text-main); padding: 14px; border: none; border-radius: 10px; cursor: pointer; flex: 1; font-weight: 700; transition: 0.2s; }
 .btn-close:hover { background: #e2e8f0; }
 
-/* =========================================
-   RESPONZIVNÍ DESIGN (MOBILNÍ ZAŘÍZENÍ)
-   ========================================= */
 @media (max-width: 850px) {
     .main-content { padding: 20px 15px; }
-    
-    /* Skrytý sidebar zleva */
     .sidebar { position: fixed; left: -300px; top: 0; height: 100vh; box-shadow: var(--shadow-hover); }
     .sidebar.open { transform: translateX(300px); }
     .sidebar-overlay.active { display: block; opacity: 1; }
     .close-menu-btn { display: block; }
-    
     .header-top { flex-direction: column; align-items: stretch; margin-bottom: 25px; gap: 15px; }
     .header-title-row { justify-content: flex-start; }
     .menu-btn { display: flex; align-items: center; justify-content: center; }
     h1 { font-size: 24px; }
-    
     .search-filter-wrapper { width: 100%; flex-direction: column; }
     .search-bar { width: 100%; }
     .toggle-filters-btn { width: 100%; }
-
     .books-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 15px; }
-    
     .modal { padding: 25px 20px; }
     .form-row { flex-direction: column; gap: 0; }
     .checkbox-group { grid-template-columns: 1fr; }
