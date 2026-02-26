@@ -1,0 +1,145 @@
+/* --- MODERNÍ PROMĚNNÉ A ZÁKLAD --- */
+:root {
+    --primary: #6366f1;
+    --primary-hover: #4f46e5;
+    --bg-color: #f3f4f6;
+    --surface: #ffffff;
+    --text-main: #1f2937;
+    --text-muted: #6b7280;
+    --border-light: 1px solid #e5e7eb;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+body { 
+    display: flex; 
+    height: 100vh; 
+    background-color: var(--bg-color); 
+    color: var(--text-main); 
+    overflow: hidden; 
+}
+
+/* --- PŘIHLAŠOVACÍ OBRAZOVKA --- */
+#loginScreen {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--bg-color); display: flex; justify-content: center; align-items: center; z-index: 2000;
+}
+.login-box {
+    background: var(--surface); padding: 40px; border-radius: 16px; box-shadow: var(--shadow-hover);
+    width: 90%; max-width: 400px; text-align: center;
+}
+.login-box h1 { margin-bottom: 20px; font-size: 24px; color: var(--primary); }
+.login-box input {
+    width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #d1d5db; border-radius: 8px; outline: none;
+}
+.login-box button {
+    width: 100%; padding: 12px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px;
+}
+.login-box button:hover { background: var(--primary-hover); }
+.login-box .btn-secondary { background: #e5e7eb; color: var(--text-main); }
+.login-box .btn-secondary:hover { background: #d1d5db; }
+.error-msg { color: #ef4444; font-size: 14px; margin-bottom: 15px; display: none; }
+
+/* --- HLAVNÍ APLIKACE --- */
+#appScreen { display: none; width: 100%; height: 100%; flex-direction: row; }
+
+/* --- LEVÉ MENU --- */
+.sidebar {
+    width: 260px; background-color: var(--surface); border-right: var(--border-light);
+    padding: 30px 20px; display: flex; flex-direction: column; z-index: 10; flex-shrink: 0;
+}
+.sidebar h2 { font-size: 20px; font-weight: 800; margin-bottom: 30px; color: var(--primary); text-transform: uppercase; }
+.sidebar ul { list-style: none; }
+.sidebar li {
+    font-size: 15px; font-weight: 500; padding: 12px 15px; margin-bottom: 5px; border-radius: 8px; cursor: pointer; color: var(--text-muted); transition: 0.2s;
+}
+.sidebar li:hover { background-color: #f3f4f6; color: var(--text-main); }
+.sidebar li.active { background-color: #eef2ff; color: var(--primary); font-weight: 600; }
+
+.sidebar-bottom { margin-top: auto; }
+.user-info { padding-top: 20px; border-top: var(--border-light); text-align: center; font-size: 14px; color: var(--text-muted); margin-bottom: 15px;}
+.logout-btn { background: #ef4444; color: white; padding: 10px; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; }
+.logout-btn:hover { background: #dc2626; }
+.add-btn { background-color: var(--primary); color: white !important; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; box-shadow: var(--shadow-sm); margin-bottom: 15px; cursor: pointer; }
+.add-btn:hover { background-color: var(--primary-hover) !important; }
+
+/* --- HLAVNÍ OBSAH --- */
+.main-content { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; gap: 15px; }
+h1 { font-size: 32px; font-weight: 800; color: var(--text-main); }
+.search-bar { width: 350px; padding: 12px 20px; border: 1px solid #d1d5db; border-radius: 20px; background-color: var(--surface); outline: none; box-shadow: var(--shadow-sm); }
+.search-bar:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2); }
+
+/* --- MŘÍŽKA KNIH --- */
+.books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px; padding-bottom: 40px; }
+.book-card { background-color: var(--surface); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-md); cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; }
+.book-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-hover); }
+.book-cover { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; background: linear-gradient(135deg, #a855f7, #6366f1); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; text-align: center; padding: 10px; }
+.book-info { padding: 15px 12px; }
+.book-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: var(--text-main); }
+.book-author { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.book-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 5px; }
+.badge { font-size: 10px; padding: 3px 6px; border-radius: 10px; font-weight: 600; text-transform: uppercase; }
+.badge-physical { background-color: #fce7f3; color: #db2777; }
+.badge-ebook { background-color: #dcfce7; color: #16a34a; }
+.badge-genre { background-color: #e0e7ff; color: #4338ca; }
+.badge-lang { background-color: #f3f4f6; color: #4b5563; border: 1px solid #d1d5db;}
+
+/* --- PRAVÝ PANEL --- */
+.right-panel { width: 280px; background-color: var(--surface); border-left: var(--border-light); padding: 30px 20px; overflow-y: auto; flex-shrink: 0; }
+.right-panel h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 10px; margin-top: 20px; }
+.filter-list { list-style: none; }
+.filter-list li { font-size: 14px; padding: 8px 10px; cursor: pointer; border-radius: 6px; color: var(--text-main); transition: 0.2s; }
+.filter-list li:hover { background-color: #f3f4f6; }
+
+/* --- MODÁLNÍ OKNO --- */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(17, 24, 39, 0.6); backdrop-filter: blur(4px); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+.modal { background: var(--surface); padding: 30px; border-radius: 16px; width: 100%; max-width: 500px; box-shadow: var(--shadow-hover); max-height: 90vh; overflow-y: auto; }
+.modal h2 { margin-bottom: 20px; color: var(--text-main); }
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 13px; color: var(--text-main); }
+.form-group input[type="text"], .form-group input[type="url"], .form-group input[type="number"], .form-group select { width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; }
+.checkbox-group { max-height: 120px; overflow-y: auto; border: 1px solid #d1d5db; border-radius: 8px; padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.checkbox-group label { font-size: 14px; display: flex; align-items: center; cursor: pointer; }
+.checkbox-group input { margin-right: 8px; cursor: pointer; }
+.form-row { display: flex; gap: 15px; }
+.btn-group { display: flex; gap: 10px; margin-top: 25px; }
+.btn-submit { background: var(--primary); color: #fff; padding: 12px; border: none; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
+.btn-close { background: #e5e7eb; color: var(--text-main); padding: 12px; border: none; border-radius: 8px; cursor: pointer; flex: 1; font-weight: 600; }
+
+/* =========================================
+   RESPONZIVNÍ DESIGN (MOBILNÍ ZAŘÍZENÍ)
+   ========================================= */
+@media (max-width: 850px) {
+    body { overflow: auto; height: auto; min-height: 100vh; }
+    #appScreen { flex-direction: column; }
+    
+    .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: var(--border-light); }
+    .sidebar h2 { display: none; }
+    .sidebar ul { 
+        display: flex; overflow-x: auto; white-space: nowrap; gap: 10px; padding-bottom: 10px;
+        -ms-overflow-style: none; scrollbar-width: none; 
+    }
+    .sidebar ul::-webkit-scrollbar { display: none; }
+    .sidebar li { margin-bottom: 0; padding: 8px 12px; font-size: 14px; }
+    
+    .sidebar-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; }
+    .user-info { padding-top: 0; border-top: none; margin-bottom: 0; }
+    .add-btn { margin-bottom: 0; flex: 1; min-width: 140px; }
+    .logout-btn { flex: 1; min-width: 100px; }
+
+    .main-content { padding: 20px 15px; overflow-y: visible; }
+    .header-top { flex-direction: column; align-items: stretch; margin-bottom: 25px; }
+    h1 { font-size: 26px; text-align: center; }
+    .search-bar { width: 100%; }
+
+    .right-panel { width: 100%; border-left: none; border-top: var(--border-light); padding: 20px 15px; overflow-y: visible; }
+    
+    .modal { padding: 20px; }
+    .form-row { flex-direction: column; gap: 0; }
+    .checkbox-group { grid-template-columns: 1fr; }
+    .btn-group { flex-direction: column-reverse; }
+}
