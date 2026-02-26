@@ -160,3 +160,40 @@ h1 { font-size: 32px; font-weight: 800; color: var(--text-main); }
 .link-rozbor:hover {
     background: #e0e7ff;
 }
+/* --- ÚPRAVY PRO E-BOOKY A SÉRIE --- */
+.book-cover.cover-ebook {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+}
+
+.link-rozbor {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 6px 10px;
+    background: #eef2ff;
+    border-radius: 6px;
+}
+.link-rozbor:hover {
+    background: #e0e7ff;
+}
+
+/* NOVÝ VZHLED PRO SLOŽKY KNIŽNÍCH SÉRIÍ */
+.series-card-special {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    border: 2px dashed #6366f1 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    min-height: 240px;
+    box-shadow: var(--shadow-md);
+}
+.series-card-special:hover {
+    border-style: solid !important;
+    background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
+    transform: translateY(-8px);
+}
