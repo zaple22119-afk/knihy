@@ -1,0 +1,12 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "knihy",
+  "orientation": "any",
+  "scope": "/knihy/",
+  "short_name": "knihy",
+  "start_url": "https://zaple22119-afk.github.io/knihy/",
+  "theme_color": "#ffffff",
+  "id": "knihy-"
+}
