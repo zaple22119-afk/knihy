@@ -127,3 +127,36 @@ h1 { font-size: 32px; font-weight: 800; color: var(--text-main); }
     .checkbox-group { grid-template-columns: 1fr; }
     .btn-group { flex-direction: column-reverse; }
 }
+/* --- ÚPRAVY PRO E-BOOKY A SÉRIE --- */
+
+/* Zelený gradient pro E-booky */
+.book-cover.cover-ebook {
+    background: linear-gradient(135deg, #4ade80, #16a34a);
+}
+
+/* Karta reprezentující celou sérii */
+.series-card {
+    border: 2px dashed var(--primary);
+    background-color: #eef2ff;
+}
+.series-card:hover {
+    border-color: var(--primary-hover);
+}
+.series-icon {
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+.link-rozbor {
+    display: inline-block;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--primary);
+    font-weight: 800;
+    text-decoration: none;
+    padding: 6px 10px;
+    background: #eef2ff;
+    border-radius: 6px;
+}
+.link-rozbor:hover {
+    background: #e0e7ff;
+}
