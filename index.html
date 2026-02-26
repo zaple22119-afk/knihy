@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Moje Knihovna</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loginScreen">
+        <div class="login-box">
+            <h1>Knihovna Login</h1>
+            <div id="loginError" class="error-msg">Špatné jméno nebo heslo.</div>
+            <input type="text" id="usernameInput" placeholder="Uživatelské jméno">
+            <input type="password" id="passwordInput" placeholder="Heslo">
+            <button onclick="login()">Přihlásit se</button>
+            <button class="btn-secondary" onclick="register()">Vytvořit nový účet</button>
+        </div>
+    </div>
+
+    <div id="appScreen">
+        <aside class="sidebar">
+            <h2>Knihovna</h2>
+            <ul id="menuList">
+                <li class="active" onclick="setActiveMenu(this); renderBooks()">Hlavní stránka</li>
+                <li onclick="setActiveMenu(this); filterByOwnership('Vlastní')">Moje knihy</li>
+                <li onclick="setActiveMenu(this); filterByReadingStatus('Dočteno')">Přečtené</li>
+                <li onclick="setActiveMenu(this); filterByOwnership('Půjčeno (cizí)')">Půjčené</li>
+                <li onclick="setActiveMenu(this); filterWishlist()">Wishlist</li>
+            </ul>
+            
+            <div class="sidebar-bottom">
+                <div class="add-btn" onclick="openModal()">+ Přidat knihu</div>
+                <div class="user-info">Přihlášen: <strong id="loggedUserName"></strong></div>
+                <div class="logout-btn" onclick="logout()">Odhlásit</div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="header-top">
+                <h1 id="pageTitle">Všechny knihy</h1>
+                <input type="text" id="searchInput" class="search-bar" placeholder="Hledat podle názvu nebo autora..." onkeyup="searchBooks()">
+            </div>
+            <div class="books-grid" id="booksGrid"></div>
+        </main>
+
+        <aside class="right-panel">
+            <h3>Formát</h3>
+            <ul class="filter-list">
+                <li onclick="filterByFormat('Fyzická')">Fyzická kniha</li>
+                <li onclick="filterByFormat('E-book')">E-book</li>
+            </ul>
+            <h3>Jazyk</h3>
+            <ul class="filter-list" id="languageList"></ul>
+            <h3>Žánry</h3>
+            <ul class="filter-list" id="genreList"></ul>
+            <h3>Stav čtení</h3>
+            <ul class="filter-list">
+                <li onclick="filterByReadingStatus('Ve čtení')">Rozečteno</li>
+                <li onclick="filterByReadingStatus('Dočteno')">Přečteno</li>
+                <li onclick="filterByReadingStatus('Nepřečteno')">Nepřečteno</li>
+            </ul>
+        </aside>
+    </div>
+
+    <div class="modal-overlay" id="bookModal">
+        <div class="modal">
+            <h2 id="modalTitle">Nová kniha</h2>
+            <form id="bookForm" onsubmit="saveBook(event)">
+                <input type="hidden" id="bookId">
+                <div class="form-group">
+                    <label>Název knihy</label>
+                    <input type="text" id="bTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Autor</label>
+                    <input type="text" id="bAuthor" list="authorDatalist" required>
+                    <datalist id="authorDatalist"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>URL obrázku obálky (volitelné)</label>
+                    <input type="url" id="bCover">
+                </div>
+                <div class="form-group">
+                    <label>Jazyk knihy</label>
+                    <select id="bLanguage">
+                        <option value="Čeština">Čeština</option>
+                        <option value="Slovenština">Slovenština</option>
+                        <option value="Angličtina">Angličtina</option>
+                        <option value="Němčina">Němčina</option>
+                        <option value="Jiné">Jiné</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Žánry (lze vybrat více)</label>
+                    <div class="checkbox-group" id="bGenresContainer"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Formát</label>
+                        <select id="bFormat">
+                            <option value="Fyzická">Fyzická kniha</option>
+                            <option value="E-book">E-book</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Stav čtení</label>
+                        <select id="bReadStatus">
+                            <option value="Nepřečteno">Nepřečteno</option>
+                            <option value="Ve čtení">Rozečteno</option>
+                            <option value="Dočteno">Dočteno</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Vlastnictví</label>
+                    <select id="bOwnership">
+                        <option value="Vlastní">Vlastním</option>
+                        <option value="Půjčeno (cizí)">Mám půjčeno</option>
+                        <option value="Půjčeno (jiným)">Půjčil jsem</option>
+                        <option value="Wishlist">Wishlist</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hodnocení (1-5)</label>
+                    <input type="number" id="bRating" min="1" max="5">
+                </div>
+                
+                <div class="form-group" id="deleteBtnContainer" style="display:none; text-align:right;">
+                    <a href="#" style="color:#ef4444; font-size:13px; text-decoration:none;" onclick="deleteBook()">🗑️ Smazat tuto knihu</a>
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" class="btn-close" onclick="closeModal()">Zrušit</button>
+                    <button type="submit" class="btn-submit">Uložit knihu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
