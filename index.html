@@ -4,7 +4,9 @@
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6366f1">
     <title>Moje Knihovna</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,8 +23,14 @@
     </div>
 
     <div id="appScreen">
-        <aside class="sidebar">
-            <h2>Knihovna</h2>
+        <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Knihovna</h2>
+                <button class="close-menu-btn" onclick="toggleSidebar()">✕</button>
+            </div>
+            
             <ul id="menuList">
                 <li class="active" onclick="setActiveMenu(this); renderBooks()">Hlavní stránka</li>
                 <li onclick="setActiveMenu(this); filterByOwnership('Vlastní')">Moje knihy</li>
@@ -34,35 +42,53 @@
             <div class="sidebar-bottom">
                 <div class="add-btn" onclick="openModal()">+ Přidat knihu</div>
                 <div class="user-info">Přihlášen: <strong id="loggedUserName"></strong></div>
-                <div class="logout-btn" onclick="logout()">Odhlásit</div>
+                <div class="logout-btn" onclick="logout()">Odhlásit se</div>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="header-top">
-                <h1 id="pageTitle">Všechny knihy</h1>
-                <input type="text" id="searchInput" class="search-bar" placeholder="Hledat podle názvu nebo autora..." onkeyup="searchBooks()">
+                <div class="header-title-row">
+                    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                    <h1 id="pageTitle">Všechny knihy</h1>
+                </div>
+                
+                <div class="search-filter-wrapper">
+                    <input type="text" id="searchInput" class="search-bar" placeholder="Hledat podle názvu nebo autora..." onkeyup="searchBooks()">
+                    <button class="toggle-filters-btn" onclick="toggleFilters()">Filtry ⚙️</button>
+                </div>
             </div>
+
+            <div id="filtersPanel" class="filters-panel hidden">
+                <div class="filters-grid">
+                    <div>
+                        <h3>Formát</h3>
+                        <ul class="filter-list">
+                            <li onclick="filterByFormat('Fyzická')">Fyzická kniha</li>
+                            <li onclick="filterByFormat('E-book')">E-book</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Stav čtení</h3>
+                        <ul class="filter-list">
+                            <li onclick="filterByReadingStatus('Ve čtení')">Rozečteno</li>
+                            <li onclick="filterByReadingStatus('Dočteno')">Přečteno</li>
+                            <li onclick="filterByReadingStatus('Nepřečteno')">Nepřečteno</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3>Jazyk</h3>
+                        <ul class="filter-list" id="languageList"></ul>
+                    </div>
+                    <div>
+                        <h3>Žánry</h3>
+                        <ul class="filter-list" id="genreList"></ul>
+                    </div>
+                </div>
+            </div>
+
             <div class="books-grid" id="booksGrid"></div>
         </main>
-
-        <aside class="right-panel">
-            <h3>Formát</h3>
-            <ul class="filter-list">
-                <li onclick="filterByFormat('Fyzická')">Fyzická kniha</li>
-                <li onclick="filterByFormat('E-book')">E-book</li>
-            </ul>
-            <h3>Jazyk</h3>
-            <ul class="filter-list" id="languageList"></ul>
-            <h3>Žánry</h3>
-            <ul class="filter-list" id="genreList"></ul>
-            <h3>Stav čtení</h3>
-            <ul class="filter-list">
-                <li onclick="filterByReadingStatus('Ve čtení')">Rozečteno</li>
-                <li onclick="filterByReadingStatus('Dočteno')">Přečteno</li>
-                <li onclick="filterByReadingStatus('Nepřečteno')">Nepřečteno</li>
-            </ul>
-        </aside>
     </div>
 
     <div class="modal-overlay" id="bookModal">
@@ -79,10 +105,14 @@
                     <input type="text" id="bAuthor" list="authorDatalist" required>
                     <datalist id="authorDatalist"></datalist>
                 </div>
+                
                 <div class="form-group">
-                    <label>URL obrázku obálky (volitelné)</label>
-                    <input type="url" id="bCover">
-                </div>
+                    <label>Obálka knihy</label>
+                    <input type="url" id="bCoverUrl" placeholder="Vložit URL odkaz na obrázek" style="margin-bottom: 8px;">
+                    <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 8px;">NEBO</div>
+                    <input type="file" id="bCoverFile" accept="image/*">
+                    <input type="hidden" id="bCoverBase64"> </div>
+
                 <div class="form-group">
                     <label>Jazyk knihy</label>
                     <select id="bLanguage">
@@ -133,7 +163,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <button type="button" class="btn-close" onclick="closeModal()">Zrušit</button>
+                    <button type="button" class="btn-close" onclick="closeModal()">← Zpět / Zrušit</button>
                     <button type="submit" class="btn-submit">Uložit knihu</button>
                 </div>
             </form>
