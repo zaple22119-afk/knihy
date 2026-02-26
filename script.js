@@ -121,7 +121,6 @@ function setActiveMenu(element) {
     document.querySelectorAll('#menuList li').forEach(li => li.classList.remove('active'));
     if(element) element.classList.add('active');
     document.getElementById('pageTitle').innerText = element ? element.innerText : 'Všechny knihy';
-    // Zavřít menu na mobilu po kliknutí
     if(window.innerWidth <= 850) toggleSidebar();
 }
 
@@ -142,6 +141,9 @@ function renderBooks(booksToRender = getUserBooks()) {
         let coverHtml = book.cover ? `<img src="${book.cover}" class="book-cover" alt="Obálka">` : `<div class="book-cover"><span>${book.title}</span></div>`;
         let formatClass = book.format === 'E-book' ? 'badge-ebook' : 'badge-physical';
         let genresHtml = (book.genres || []).map(g => `<span class="badge badge-genre">${g}</span>`).join('');
+        
+        // Přidání textové recenze, pokud existuje
+        let reviewHtml = book.review ? `<div class="book-review-preview">"${book.review}"</div>` : '';
 
         card.innerHTML = `
             ${coverHtml}
@@ -155,6 +157,7 @@ function renderBooks(booksToRender = getUserBooks()) {
                     ${book.rating ? '<span class="badge badge-read">⭐ ' + book.rating + '</span>' : ''}
                 </div>
                 <div class="book-badges" style="margin-top: 5px;">${genresHtml}</div>
+                ${reviewHtml}
             </div>
         `;
         grid.appendChild(card);
@@ -170,23 +173,41 @@ function searchBooks() {
     renderBooks(filtered);
 }
 
-function filterByFormat(format) { renderBooks(getUserBooks().filter(b => b.format === format)); }
-function filterByReadingStatus(status) { renderBooks(getUserBooks().filter(b => b.readStatus === status)); }
-function filterByOwnership(status) { renderBooks(getUserBooks().filter(b => b.ownership === status)); }
-function filterWishlist() { renderBooks(getUserBooks().filter(b => b.ownership === 'Wishlist')); }
-function filterByGenre(genre) { renderBooks(getUserBooks().filter(b => b.genres && b.genres.includes(genre))); }
-function filterByLanguage(lang) { renderBooks(getUserBooks().filter(b => b.language === lang)); }
+// Úprava pro Select filtry (pokud je prázdná hodnota, zobrazí se vše)
+function filterByFormat(format) { 
+    if(!format) { renderBooks(); return; }
+    renderBooks(getUserBooks().filter(b => b.format === format)); 
+}
+function filterByReadingStatus(status) { 
+    if(!status) { renderBooks(); return; }
+    renderBooks(getUserBooks().filter(b => b.readStatus === status)); 
+}
+function filterByOwnership(status) { 
+    renderBooks(getUserBooks().filter(b => b.ownership === status)); 
+}
+function filterWishlist() { 
+    renderBooks(getUserBooks().filter(b => b.ownership === 'Wishlist')); 
+}
+function filterByGenre(genre) { 
+    if(!genre) { renderBooks(); return; }
+    renderBooks(getUserBooks().filter(b => b.genres && b.genres.includes(genre))); 
+}
+function filterByLanguage(lang) { 
+    if(!lang) { renderBooks(); return; }
+    renderBooks(getUserBooks().filter(b => b.language === lang)); 
+}
 
+// Generování možností do <select> filtrů
 function updateFiltersAndAuthors() {
     const userBooks = getUserBooks();
     
     let allGenres = [];
     userBooks.forEach(b => { if(b.genres) allGenres.push(...b.genres); });
     const uniqueGenres = [...new Set(allGenres)].sort();
-    document.getElementById('genreList').innerHTML = uniqueGenres.map(g => `<li onclick="filterByGenre('${g}')">${g}</li>`).join('');
+    document.getElementById('filterGenre').innerHTML = '<option value="">Všechny žánry</option>' + uniqueGenres.map(g => `<option value="${g}">${g}</option>`).join('');
 
     const uniqueLangs = [...new Set(userBooks.map(b => b.language).filter(Boolean))].sort();
-    document.getElementById('languageList').innerHTML = uniqueLangs.map(l => `<li onclick="filterByLanguage('${l}')">${l}</li>`).join('');
+    document.getElementById('filterLanguage').innerHTML = '<option value="">Všechny jazyky</option>' + uniqueLangs.map(l => `<option value="${l}">${l}</option>`).join('');
 
     const authors = [...new Set(userBooks.map(b => b.author))].sort();
     document.getElementById('authorDatalist').innerHTML = authors.map(a => `<option value="${a}">`).join('');
@@ -199,7 +220,6 @@ document.getElementById('bCoverFile').addEventListener('change', function(event)
         const reader = new FileReader();
         reader.onload = function(e) {
             document.getElementById('bCoverBase64').value = e.target.result;
-            // Automaticky vymažeme URL pole, aby se to netlouklo
             document.getElementById('bCoverUrl').value = ''; 
         };
         reader.readAsDataURL(file);
@@ -210,7 +230,7 @@ document.getElementById('bCoverFile').addEventListener('change', function(event)
 function openModal() {
     document.getElementById('bookForm').reset();
     document.getElementById('bookId').value = '';
-    document.getElementById('bCoverBase64').value = ''; // Reset skrytého pole pro obrázek
+    document.getElementById('bCoverBase64').value = ''; 
     document.getElementById('modalTitle').innerText = 'Přidat novou knihu';
     document.getElementById('deleteBtnContainer').style.display = 'none';
     document.querySelectorAll('.genre-checkbox').forEach(cb => cb.checked = false);
@@ -227,16 +247,18 @@ function editBook(id) {
     document.getElementById('bTitle').value = book.title;
     document.getElementById('bAuthor').value = book.author;
     
-    // Zjistíme, jestli má kniha uložený base64 obrázek nebo URL
     document.getElementById('bCoverUrl').value = book.cover && book.cover.startsWith('http') ? book.cover : '';
     document.getElementById('bCoverBase64').value = book.cover && book.cover.startsWith('data:image') ? book.cover : '';
-    document.getElementById('bCoverFile').value = ''; // Reset inputu souboru
+    document.getElementById('bCoverFile').value = ''; 
     
     document.getElementById('bLanguage').value = book.language || 'Čeština';
     document.getElementById('bFormat').value = book.format;
     document.getElementById('bOwnership').value = book.ownership;
     document.getElementById('bReadStatus').value = book.readStatus;
     document.getElementById('bRating').value = book.rating || '';
+    
+    // Načtení recenze do textarey
+    document.getElementById('bReview').value = book.review || '';
     
     document.querySelectorAll('.genre-checkbox').forEach(cb => { cb.checked = (book.genres || []).includes(cb.value); });
     
@@ -250,7 +272,6 @@ function saveBook(e) {
     const id = document.getElementById('bookId').value;
     const selectedGenres = Array.from(document.querySelectorAll('.genre-checkbox:checked')).map(cb => cb.value);
 
-    // Zjistíme, odkud vzít obálku (soubor má přednost před URL)
     let finalCover = document.getElementById('bCoverBase64').value;
     if (!finalCover) {
         finalCover = document.getElementById('bCoverUrl').value;
@@ -266,7 +287,8 @@ function saveBook(e) {
         format: document.getElementById('bFormat').value,
         ownership: document.getElementById('bOwnership').value,
         readStatus: document.getElementById('bReadStatus').value,
-        rating: document.getElementById('bRating').value
+        rating: document.getElementById('bRating').value,
+        review: document.getElementById('bReview').value // Uložení textové recenze
     };
 
     if (id) {
