@@ -2,11 +2,19 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "knihy",
+  "name": "Moje Knihovna",
   "orientation": "any",
   "scope": "/knihy/",
-  "short_name": "knihy",
+  "short_name": "Knihovna",
   "start_url": "https://zaple22119-afk.github.io/knihy/",
-  "theme_color": "#ffffff",
-  "id": "knihy-"
+  "theme_color": "#6366f1",
+  "id": "knihovna-app",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
 }
