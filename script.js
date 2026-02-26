@@ -2,9 +2,9 @@
 const defaultGenres = ["Beletrie", "Sci-fi", "Fantasy", "Detektivka", "Thriller", "Horor", "Romantika", "Historický román", "Odborná literatura", "Osobní rozvoj", "Biografie", "Poezie", "Komiks / Manga", "Klasika"];
 
 // --- STAV APLIKACE ---
-let users = []; // Formát: { username: 'test', password: '123' }
-let allBooks = []; // Všechny knihy všech uživatelů
-let currentUser = null; // Kdo je zrovna přihlášený
+let users = []; 
+let allBooks = []; 
+let currentUser = null; 
 
 // --- INICIALIZACE A NAČTÁNÍ Z LOCALSTORAGE ---
 function loadData() {
@@ -97,6 +97,16 @@ function logout() {
     showLogin();
 }
 
+// --- UI FUNKCE (Menu, Filtry) ---
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+
+function toggleFilters() {
+    document.getElementById('filtersPanel').classList.toggle('hidden');
+}
+
 // --- ZÍSKÁNÍ KNIH AKTUÁLNÍHO UŽIVATELE ---
 function getUserBooks() {
     return allBooks.filter(b => b.owner === currentUser);
@@ -111,6 +121,8 @@ function setActiveMenu(element) {
     document.querySelectorAll('#menuList li').forEach(li => li.classList.remove('active'));
     if(element) element.classList.add('active');
     document.getElementById('pageTitle').innerText = element ? element.innerText : 'Všechny knihy';
+    // Zavřít menu na mobilu po kliknutí
+    if(window.innerWidth <= 850) toggleSidebar();
 }
 
 // --- VYKRESLOVÁNÍ KNIH ---
@@ -139,7 +151,8 @@ function renderBooks(booksToRender = getUserBooks()) {
                 <div class="book-badges">
                     <span class="badge ${formatClass}">${book.format}</span>
                     <span class="badge badge-lang">🌐 ${book.language || 'Neznámo'}</span>
-                    ${book.readStatus === 'Dočteno' ? '<span class="badge" style="background:#fef08a; color:#854d0e;">⭐ ' + (book.rating || '-') + '</span>' : ''}
+                    ${book.readStatus === 'Dočteno' ? '<span class="badge badge-read">✓ Přečteno</span>' : ''}
+                    ${book.rating ? '<span class="badge badge-read">⭐ ' + book.rating + '</span>' : ''}
                 </div>
                 <div class="book-badges" style="margin-top: 5px;">${genresHtml}</div>
             </div>
@@ -179,10 +192,25 @@ function updateFiltersAndAuthors() {
     document.getElementById('authorDatalist').innerHTML = authors.map(a => `<option value="${a}">`).join('');
 }
 
+// --- NAHRÁVÁNÍ OBRÁZKU DO BASE64 ---
+document.getElementById('bCoverFile').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('bCoverBase64').value = e.target.result;
+            // Automaticky vymažeme URL pole, aby se to netlouklo
+            document.getElementById('bCoverUrl').value = ''; 
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
 // --- MODÁLNÍ OKNO A FORMULÁŘ ---
 function openModal() {
     document.getElementById('bookForm').reset();
     document.getElementById('bookId').value = '';
+    document.getElementById('bCoverBase64').value = ''; // Reset skrytého pole pro obrázek
     document.getElementById('modalTitle').innerText = 'Přidat novou knihu';
     document.getElementById('deleteBtnContainer').style.display = 'none';
     document.querySelectorAll('.genre-checkbox').forEach(cb => cb.checked = false);
@@ -198,7 +226,12 @@ function editBook(id) {
     document.getElementById('bookId').value = book.id;
     document.getElementById('bTitle').value = book.title;
     document.getElementById('bAuthor').value = book.author;
-    document.getElementById('bCover').value = book.cover || '';
+    
+    // Zjistíme, jestli má kniha uložený base64 obrázek nebo URL
+    document.getElementById('bCoverUrl').value = book.cover && book.cover.startsWith('http') ? book.cover : '';
+    document.getElementById('bCoverBase64').value = book.cover && book.cover.startsWith('data:image') ? book.cover : '';
+    document.getElementById('bCoverFile').value = ''; // Reset inputu souboru
+    
     document.getElementById('bLanguage').value = book.language || 'Čeština';
     document.getElementById('bFormat').value = book.format;
     document.getElementById('bOwnership').value = book.ownership;
@@ -217,11 +250,17 @@ function saveBook(e) {
     const id = document.getElementById('bookId').value;
     const selectedGenres = Array.from(document.querySelectorAll('.genre-checkbox:checked')).map(cb => cb.value);
 
+    // Zjistíme, odkud vzít obálku (soubor má přednost před URL)
+    let finalCover = document.getElementById('bCoverBase64').value;
+    if (!finalCover) {
+        finalCover = document.getElementById('bCoverUrl').value;
+    }
+
     const bookData = {
         owner: currentUser,
         title: document.getElementById('bTitle').value,
         author: document.getElementById('bAuthor').value,
-        cover: document.getElementById('bCover').value,
+        cover: finalCover,
         language: document.getElementById('bLanguage').value,
         genres: selectedGenres,
         format: document.getElementById('bFormat').value,
@@ -256,6 +295,7 @@ function deleteBook() {
 
 // Start aplikace
 window.onload = loadData;
+
 // --- REGISTRACE SERVICE WORKERU (PWA) ---
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
