@@ -61,28 +61,34 @@
 
             <div id="filtersPanel" class="filters-panel hidden">
                 <div class="filters-grid">
-                    <div>
-                        <h3>Formát</h3>
-                        <ul class="filter-list">
-                            <li onclick="filterByFormat('Fyzická')">Fyzická kniha</li>
-                            <li onclick="filterByFormat('E-book')">E-book</li>
-                        </ul>
+                    <div class="filter-group">
+                        <label>Formát</label>
+                        <select onchange="filterByFormat(this.value)">
+                            <option value="">Všechny formáty</option>
+                            <option value="Fyzická">Fyzická kniha</option>
+                            <option value="E-book">E-book</option>
+                        </select>
                     </div>
-                    <div>
-                        <h3>Stav čtení</h3>
-                        <ul class="filter-list">
-                            <li onclick="filterByReadingStatus('Ve čtení')">Rozečteno</li>
-                            <li onclick="filterByReadingStatus('Dočteno')">Přečteno</li>
-                            <li onclick="filterByReadingStatus('Nepřečteno')">Nepřečteno</li>
-                        </ul>
+                    <div class="filter-group">
+                        <label>Stav čtení</label>
+                        <select onchange="filterByReadingStatus(this.value)">
+                            <option value="">Všechny stavy</option>
+                            <option value="Ve čtení">Rozečteno</option>
+                            <option value="Dočteno">Přečteno</option>
+                            <option value="Nepřečteno">Nepřečteno</option>
+                        </select>
                     </div>
-                    <div>
-                        <h3>Jazyk</h3>
-                        <ul class="filter-list" id="languageList"></ul>
+                    <div class="filter-group">
+                        <label>Jazyk</label>
+                        <select id="filterLanguage" onchange="filterByLanguage(this.value)">
+                            <option value="">Všechny jazyky</option>
+                        </select>
                     </div>
-                    <div>
-                        <h3>Žánry</h3>
-                        <ul class="filter-list" id="genreList"></ul>
+                    <div class="filter-group">
+                        <label>Žánry</label>
+                        <select id="filterGenre" onchange="filterByGenre(this.value)">
+                            <option value="">Všechny žánry</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -111,7 +117,8 @@
                     <input type="url" id="bCoverUrl" placeholder="Vložit URL odkaz na obrázek" style="margin-bottom: 8px;">
                     <div style="text-align: center; font-size: 12px; color: #6b7280; margin-bottom: 8px;">NEBO</div>
                     <input type="file" id="bCoverFile" accept="image/*">
-                    <input type="hidden" id="bCoverBase64"> </div>
+                    <input type="hidden" id="bCoverBase64">
+                </div>
 
                 <div class="form-group">
                     <label>Jazyk knihy</label>
@@ -131,31 +138,38 @@
                     <div class="form-group" style="flex: 1;">
                         <label>Formát</label>
                         <select id="bFormat">
-                            <option value="Fyzická">Fyzická kniha</option>
-                            <option value="E-book">E-book</option>
+                            <option value=\"Fyzická\">Fyzická kniha</option>
+                            <option value=\"E-book\">E-book</option>
                         </select>
                     </div>
                     <div class="form-group" style="flex: 1;">
                         <label>Stav čtení</label>
                         <select id="bReadStatus">
-                            <option value="Nepřečteno">Nepřečteno</option>
-                            <option value="Ve čtení">Rozečteno</option>
-                            <option value="Dočteno">Dočteno</option>
+                            <option value=\"Nepřečteno\">Nepřečteno</option>
+                            <option value=\"Ve čtení\">Rozečteno</option>
+                            <option value=\"Dočteno\">Dočteno</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label>Vlastnictví</label>
                     <select id="bOwnership">
-                        <option value="Vlastní">Vlastním</option>
-                        <option value="Půjčeno (cizí)">Mám půjčeno</option>
-                        <option value="Půjčeno (jiným)">Půjčil jsem</option>
-                        <option value="Wishlist">Wishlist</option>
+                        <option value=\"Vlastní\">Vlastním</option>
+                        <option value=\"Půjčeno (cizí)\">Mám půjčeno</option>
+                        <option value=\"Půjčeno (jiným)\">Půjčil jsem</option>
+                        <option value=\"Wishlist\">Wishlist</option>
                     </select>
                 </div>
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Hodnocení (1-5)</label>
+                        <input type="number" id="bRating" min="1" max="5">
+                    </div>
+                </div>
+
                 <div class="form-group">
-                    <label>Hodnocení (1-5)</label>
-                    <input type="number" id="bRating" min="1" max="5">
+                    <label>Slovní hodnocení (Recenze)</label>
+                    <textarea id="bReview" rows="3" placeholder="Co si o knize myslíte?"></textarea>
                 </div>
                 
                 <div class="form-group" id="deleteBtnContainer" style="display:none; text-align:right;">
